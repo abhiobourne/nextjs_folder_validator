@@ -5,11 +5,21 @@ const standards = require("../project-standards.json");
 
 const SRC_PATH = path.join(__dirname, "..", "src");
 
-// Validate src folders
+// Utility: get only directories
+function getDirectories(sourcePath) {
+  return fs
+    .readdirSync(sourcePath)
+    .filter(name =>
+      fs.statSync(path.join(sourcePath, name)).isDirectory()
+    );
+}
+
+// Validate top-level src folders
 function checkSrcFolders() {
-  const folders = fs.readdirSync(SRC_PATH);
+  const folders = getDirectories(SRC_PATH);
+
   const invalid = folders.filter(
-    f => !standards.srcFolders.includes(f)
+    folder => !standards.srcFolders.includes(folder)
   );
 
   if (invalid.length) {
@@ -24,11 +34,11 @@ function checkComponentsSubfolders() {
 
   if (!fs.existsSync(componentsPath)) return;
 
-  const subfolders = fs.readdirSync(componentsPath);
+  const subfolders = getDirectories(componentsPath);
 
   const allowed = [
     ...standards.componentsSubfolders,
-    ...subfolders.filter(f => f.endsWith("-page"))
+    ...subfolders.filter(f => f.endsWith("-page")) // allow page-specific folders
   ];
 
   const invalid = subfolders.filter(f => !allowed.includes(f));
@@ -39,6 +49,7 @@ function checkComponentsSubfolders() {
   }
 }
 
+// Run validations
 checkSrcFolders();
 checkComponentsSubfolders();
 
