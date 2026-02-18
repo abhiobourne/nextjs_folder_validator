@@ -24,7 +24,9 @@ function checkComponentsSubfolders() {
 
   if (!fs.existsSync(componentsPath)) return;
 
-  const subfolders = fs.readdirSync(componentsPath);
+  const subfolders = fs
+    .readdirSync(componentsPath)
+    .filter(f => fs.statSync(path.join(componentsPath, f)).isDirectory());
 
   const allowed = [
     ...standards.componentsSubfolders,
